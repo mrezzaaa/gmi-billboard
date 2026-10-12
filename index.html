@@ -349,7 +349,40 @@
     section.s {
       padding: clamp(70px, 10vw, 140px) clamp(16px, 4vw, 48px);
       max-width: 1280px;
-      margin: auto
+      margin: auto;
+      position: relative;
+      overflow: hidden;
+    }
+
+    section.s::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: 
+        radial-gradient(circle 800px at 20% 30%, rgba(39, 170, 225, 0.12) 0%, transparent 60%),
+        radial-gradient(circle 600px at 80% 70%, rgba(237, 32, 36, 0.10) 0%, transparent 60%),
+        radial-gradient(circle 400px at 50% 50%, rgba(255, 207, 90, 0.08) 0%, transparent 50%),
+        linear-gradient(135deg, rgba(39, 170, 225, 0.03) 0%, transparent 30%, rgba(237, 32, 36, 0.03) 100%);
+      animation: bgFloat 20s ease-in-out infinite;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    section.s > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    @keyframes bgFloat {
+      0%, 100% {
+        transform: translate(0, 0) scale(1);
+      }
+      33% {
+        transform: translate(30px, -30px) scale(1.1);
+      }
+      66% {
+        transform: translate(-20px, 20px) scale(0.95);
+      }
     }
 
     .eyebrow {
@@ -627,23 +660,26 @@
       }
 
       .hud {
-        left: 16px;
-        right: auto;
+        left: auto;
+        right: 16px;
         text-align: left;
-        bottom: 24px
+        top: 90px;
+        bottom: auto;
       }
 
       .hud .row {
         justify-content: flex-start
       }
 
+
       .hc {
-        left: 16px;
-        right: 16px;
-        max-width: none;
-        bottom: -60px;
-        transition: bottom 0.4s ease-out;
+          left: auto;
+          right: 16px;
+          max-width: 50%;
+          transition: bottom 0.4s ease-out;
+          top: 30%;
       }
+
       
       .hc.scrolled {
         bottom: 80px;
@@ -920,7 +956,7 @@
       for (let i = 0; i < 9; i++) { const l = new THREE.Mesh(new THREE.BoxGeometry(.5, .18, .4), new THREE.MeshBasicMaterial({ color: 0xfff2cc })); l.position.set(-7 + i * 1.75, 15.6, 1.2); bb.add(l) }
       const U = { a: { value: tex[0] }, b: { value: tex[1] }, t: { value: 0 }, tm: { value: 0 } };
       const scr = new THREE.Mesh(new THREE.PlaneGeometry(16, 9), new THREE.ShaderMaterial({ uniforms: U, vertexShader: 'varying vec2 v;void main(){v=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}', fragmentShader: 'uniform sampler2D a,b;uniform float t,tm;varying vec2 v;void main(){float s=floor(v.x*20.)/20.;float d=smoothstep(0.,1.,clamp(t*1.7-s*.7,0.,1.));vec4 A=texture2D(a,v+vec2(0.,d*.2));vec4 B=texture2D(b,v-vec2(0.,(1.-d)*.2));vec4 c=mix(A,B,d);c.rgb*=1.05+.06*sin(v.y*700.+tm*2.);c.rgb+=vec3(1.,.8,.4)*.35*smoothstep(.0,.5,d)*smoothstep(1.,.5,d);gl_FragColor=vec4(c.rgb,1.);}' })); scr.position.set(0, 10.2, .35); bb.add(scr);
-      const cars = []; for (let i = 0; i < 14; i++) { const lane = i % 2; const g = new THREE.Group(); g.add(new THREE.Mesh(new THREE.BoxGeometry(1.7, .9, 3.6), M([0x27aae1, 0xed2024, 0x2a3140, 0xf2f4f8, 0x8a93a8][i % 5])));[-.6, .6].forEach(x => { const t = new THREE.Mesh(new THREE.BoxGeometry(.4, .2, .1), new THREE.MeshBasicMaterial({ color: lane === 0 ? 0xff2a2a : 0xfff4d0 })); t.position.set(x, .1, lane === 0 ? -1.8 : 1.8); g.add(t) }); g.position.set(lane === 0 ? 4 : 12, .6, -Math.random() * 200 + 40); g.userData = { lane, speed: 9 + Math.random() * 8 }; cars.push(g); S.add(g) }
+      const cars = []; for (let i = 0; i < 14; i++) { const lane = i % 2; const g = new THREE.Group(); g.add(new THREE.Mesh(new THREE.BoxGeometry(1.7, .9, 3.6), M([0x27aae1, 0xed2024, 0x2a3140, 0xf2f4f8, 0x8a93a8][i % 5])));[-.6, .6].forEach(x => { const t = new THREE.Mesh(new THREE.BoxGeometry(.4, .2, .1), new THREE.MeshBasicMaterial({ color: lane === 0 ? 0xff2a2a : 0xfff4d0 })); t.position.set(x, .1, lane === 0 ? -1.8 : 1.8); g.add(t) }); g.position.set(lane === 0 ? 4 : 12, .45, -Math.random() * 200 + 40); g.userData = { lane, speed: 9 + Math.random() * 8 }; cars.push(g); S.add(g) }
       const pg = new THREE.BufferGeometry(), N = 500, pa = new Float32Array(N * 3); for (let i = 0; i < N; i++) { pa[i * 3] = (Math.random() - .5) * 120; pa[i * 3 + 1] = Math.random() * 50; pa[i * 3 + 2] = -Math.random() * 120 + 20 } pg.setAttribute('position', new THREE.BufferAttribute(pa, 3));
       const pts = new THREE.Points(pg, new THREE.PointsMaterial({ color: 0x7cc8ee, size: .14, transparent: true, opacity: .55 })); S.add(pts);
       let cur = 0, nxt = 1, tr = 1, last = 0, mx = 0, my = 0, vis = true;
